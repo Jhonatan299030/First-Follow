@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int stringlength(string x)
+int StringLength(string x)
 {
 	int count = 1;
 	for(int i = 0; x[i + 1] != '\0'; i++)
@@ -16,26 +16,31 @@ int stringlength(string x)
 	return count;
 }
 
-int maiorsequencia(int NEstados, string V[])
+int NumeroProducoes(string x)
 {
-	int TamanhhoSequencia, NSimbolos, MSequencia = 0;
+	int TamanhhoSequencia = 1, NSimbolos = StringLength(x);
+	
+	for(int i = 0; i < NSimbolos; i++)
+	{
+		if(x[i] == ' ')
+		{
+			TamanhhoSequencia++;
+		}
+	}
+	return TamanhhoSequencia;
+}
+
+int MaiorNumeroProducoes(int NEstados, string V[])
+{
+	int SequenciaAtual, MSequencia = 0;
 	string aux;
 
 	for(int i = 0; i < NEstados; i++)
 	{
-		TamanhhoSequencia = 1;
 		aux = V[i];
-		NSimbolos = stringlength(aux);
-		for(int j = 0; j < NSimbolos; j++)
-		{
-			if(aux[j] == ' ')
-			{
-				TamanhhoSequencia++;
-			}
-		}
-
-		if(MSequencia < TamanhhoSequencia)
-			MSequencia = TamanhhoSequencia;
+		SequenciaAtual = NumeroProducoes(aux);
+		if(MSequencia < SequenciaAtual)
+			MSequencia = SequenciaAtual;
 	}
 
 	return MSequencia;
@@ -44,7 +49,7 @@ int maiorsequencia(int NEstados, string V[])
 string RemoveEspacos(string x)
 {
 	char atual;
-	int tam = stringlength(x);
+	int tam = StringLength(x);
 	for(int i = 0; i < tam; i++)
 	{
 		atual = x[i];
@@ -62,7 +67,7 @@ string RemoveEspacos(string x)
 string SepararProducoes(string x, int ProdAtual)
 {
 	char atual;
-	int count = 0, tam = stringlength(x);
+	int count = 0, tam = StringLength(x);
 	string producao = "\0";
 	for(int i = 0; i < tam; i++)
 	{
@@ -78,36 +83,30 @@ string SepararProducoes(string x, int ProdAtual)
 	}
 	return producao;
 }
-bool EstadoTerminal(string EstadosNT, char CharComparacao)
+bool EstadoNaoTerminal(string EstadosNT, char CharComparacao, int NEstados)
 {
-	int NEstados, Count=0;
 	char AuxCharComparacao;
-	
-	NEstados = stringlength(EstadosNT);
 	
 	for(int k = 0; k < NEstados; k++)
 	{
 		AuxCharComparacao = EstadosNT[k];
-		if(CharComparacao != AuxCharComparacao)
+		if(CharComparacao == AuxCharComparacao)
 		{
-			Count++;
+			return true;
 		}		
 	}
-	if(Count == NEstados)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
-/*
-string FirstIndireto(char Estado, int colunas, string Mat[][])
-{
-
+int Indice(string EstadosNT, char Comparacao, int NEstados){
+	char Aux;
+	for(int i=0; i < NEstados; i++)
+	{
+		Aux = EstadosNT[i];
+		if(Aux == Comparacao)
+			return i;
+	}
+	return -1;
 }
-*/
 int main()
 {
 //Declaracao variaveis
@@ -130,10 +129,10 @@ int main()
 		printf("Digite os Estados nao terminais: \n");
 		getline(cin, EstadosNT);
 		EstadosNT = RemoveEspacos(EstadosNT);
-		NEstados = stringlength(EstadosNT);
+		NEstados = StringLength(EstadosNT);
 		string ProducoesEstados[NEstados];
 
-		//Inserindo a derivacao dos estados
+		//Inserindo as producoes dos estados
 		for(i = 0; i < NEstados; i++)
 		{
 			fflush(stdin);
@@ -144,7 +143,7 @@ int main()
 			getline(cin, ProducoesEstados[i]);
 		}
 		//Encontra a maior sequencia de producoes para definir o numero de colunas
-		NSequencias = maiorsequencia(NEstados, ProducoesEstados);
+		NSequencias = MaiorNumeroProducoes(NEstados, ProducoesEstados);
 
 		//Cria as matrizes de gramatica / first / follow
 		string gramatica[NEstados][NSequencias + 1];
@@ -170,6 +169,14 @@ int main()
 			}
 		}
 		
+		//Vetor com o numero de producoes de cada estado nao terminal
+		int NProducoes[NEstados];
+		for(i=0; i < NEstados; i++)
+		{
+			NProducoes[i] = NumeroProducoes(ProducoesEstados[i]);
+			cout << NProducoes[i];
+		}
+		
 		cout << "\n\n";
 		//Insere as producoes na matriz
 		for(i = 0; i < NEstados; i++)
@@ -192,7 +199,7 @@ int main()
 			{
 				AuxString = gramatica[i][j];
 				AuxChar = AuxString[0];
-				if(EstadoTerminal(EstadosNT,AuxChar))
+				if(!EstadoNaoTerminal(EstadosNT, AuxChar, NEstados))
 				{
 					first[i][j] += AuxChar;
 				}
@@ -200,11 +207,14 @@ int main()
 			}
 			cout << "\n";
 		}
-/*
+		
+		
+		/*
 		//First indireto
 		while(1)
 		{
 			string AuxStringInterna;
+			int indice, Count = 0;
 			char AuxCharInterno;
 
 			for(i = 0; i < NEstados; i++)
@@ -217,21 +227,22 @@ int main()
 					{
 						AuxString = gramatica[i][j];
 						AuxChar = AuxString[0];
-						if(!EstadoTerminal(EstadosNT,AuxChar))
+						if(EstadoNaoTerminal(EstadosNT, AuxChar, NEstados))
 						{
-							FirstIndireto(AuxChar);
+							indice = Indice(EstadosNT, AuxChar, NEstados);
+							
+							//Pegar first do indice da matriz
 						}
+					}
+					else if(!EstadoNaoTerminal(EstadosNT, AuxChar, NEstados))
+					{
+						Count++;
 					}
 				}
 			}
-		}
-
-*/
-
-
-
-
-
+			if(Count == (NEstados * (NSequencias-1)))
+				break;
+		}*/
 	}
 	else if(op == 2)
 	{
