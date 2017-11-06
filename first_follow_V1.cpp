@@ -226,14 +226,48 @@ int main()
 			{
 				for(j = 1; j < NSequencias; j++)
 				{
+					////////Aqui verificar se por um looping while utilizando o CharAtual 
+					////////resolveria a continuidade da sequencia
 					AuxStringInterna = first[i][j];
 					AuxCharInterno = StringAuxInterna[0];
-					CharAtual=0;
-					if(CharAuxInterno != '\0')
+					CharAtual = 0;
+					
+					//////Ideia atual = If verifica se ultima caracter eh um estado nao terminal e faz
+					//////Varedura de first novamente, se for nao terminal e vazio concatena com o prox
+					///// se nao for segue o jogo
+					if(EstadoNaoTerminal(EstadosNT, CharAuxInterno, NEstados))
 					{
-						Count++;
+						indice = Indice(EstadosNT, AuxCharInterno, NEstados);
+						string s;
+						char c;
+						for(int k = 0; k < NSequencias; k++)
+						{
+							s = first[indice][k];
+							c = s[0];
+							if(c != '\0')
+								AuxInt++;
+						}
+						if(AuxInt == NProducoes[indice])
+						{
+							for(int k = 0; k < NSequencias; k++)
+							{
+								StringFirst += first[indice][k];
+							}
+							StringFirst = RemoveEspacos(StringFirst);
+							AuxInt1 = StringLength(StringFirst);
+							c = StringFirst[AuxInt1];
+							if(c == '/')
+							{
+								CharAtual++;
+								NextChar = AuxString[CharAtual];
+								if(NextChar != '\0')
+								{
+									StringFirst[AuxInt1] = NextChar;
+								}
+							}
+						}
 					}
-					else
+					elseif(CharAuxInterno == '\0')
 					{
 						AuxString = gramatica[i][j];
 						AuxChar = AuxString[0];
@@ -264,24 +298,21 @@ int main()
 									NextChar = AuxString[CharAtual];
 									if(NextChar != '\0')
 									{
-										if(!EstadoNaoTerminal(EstadosNT, NextChar, NEstados))
-										{
-											StringFirst[AuxInt1] = NextChar;
-										}
-										else
-										{
-											
-										}
+										StringFirst[AuxInt1] = NextChar;
 									}
 								}
 							}
 						}
 					}
+					else
+					{
+						Count++;
+					}
 				}
 			}
 
-						  if(Count == NProducoesTotais)
-							  break;
+			if(Count == NProducoesTotais)
+				break;
 		}
 	}
 	else if(op == 2)
