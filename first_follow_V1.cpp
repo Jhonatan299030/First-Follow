@@ -11,8 +11,13 @@ using namespace std;
 int StringLength(string x)
 {
 	int count = 1;
+	if(x == "")
+	{
+		return 0;
+	}
 	for(int i = 0; x[i + 1] != '\0'; i++)
 		count++;
+
 	return count;
 }
 
@@ -46,14 +51,14 @@ int MaiorNumeroProducoes(int NEstados, string V[])
 	return MSequencia;
 }
 
-string RemoveEspacos(string x)
+string RemoveEspacos(string x, char c)
 {
 	char atual;
 	int tam = StringLength(x);
 	for(int i = 0; i < tam; i++)
 	{
 		atual = x[i];
-		if(atual == ' ')
+		if(atual == c)
 		{
 			for(int j = i; j < tam; j++)
 			{
@@ -68,7 +73,7 @@ string SepararProducoes(string x, int ProdAtual)
 {
 	char atual;
 	int count = 0, tam = StringLength(x);
-	string producao = "\0";
+	string producao;
 	for(int i = 0; i < tam; i++)
 	{
 		atual = x[i];
@@ -108,6 +113,27 @@ int Indice(string EstadosNT, char Comparacao, int NEstados)
 	}
 	return -1;
 }
+string StringConcat(string x, string y)
+{
+	int Intx, Inty, Intx1, j;
+	Inty = StringLength(y);
+	Intx = StringLength(x);
+	x[Intx] = y[0];
+	Intx1 = StringLength(x);
+	if(Intx < Intx1)
+	{
+		j = 1;
+	}
+	else
+	{
+		j = 0;
+	}
+	for(int i = j; i < Inty; i++)
+	{
+		x += y[i];
+	}
+	return x;
+}
 int main()
 {
 //Declaracao variaveis
@@ -129,7 +155,7 @@ int main()
 		fflush(stdin);
 		printf("Digite os Estados nao terminais: \n");
 		getline(cin, EstadosNT);
-		EstadosNT = RemoveEspacos(EstadosNT);
+		EstadosNT = RemoveEspacos(EstadosNT, ' ');
 		NEstados = StringLength(EstadosNT);
 		string ProducoesEstados[NEstados];
 
@@ -196,17 +222,15 @@ int main()
 		//First direto
 		for(i = 0; i < NEstados; i++)
 		{
-			for(j = 1; j < NSequencias; j++)
+			for(j = 1; j < NSequencias + 1; j++)
 			{
 				AuxString = gramatica[i][j];
 				AuxChar = AuxString[0];
 				if(!EstadoNaoTerminal(EstadosNT, AuxChar, NEstados))
 				{
-					first[i][j] += AuxChar;
+					first[i][j] = AuxChar;
 				}
-				cout << first[i][j];
 			}
-			cout << "\n";
 		}
 
 		//Contagem do total de producoes
@@ -218,65 +242,32 @@ int main()
 		//First indireto
 		while(1)
 		{
-			string AuxStringInterna, StringFirst;
+			string AuxStringInterna, StringFirst, StringRetorno, x;
 			int indice, AuxInt, AuxInt1, CharAtual, Count = 0;
 			char AuxCharInterno, NextChar;
 
 			for(i = 0; i < NEstados; i++)
 			{
-				for(j = 1; j < NSequencias; j++)
+				for(j = 1; j < NSequencias + 1; j++)
 				{
-					////////Aqui verificar se por um looping while utilizando o CharAtual 
+					////////Aqui verificar se por um looping while utilizando o CharAtual
 					////////resolveria a continuidade da sequencia
-					AuxStringInterna = first[i][j];
-					AuxCharInterno = StringAuxInterna[0];
+					AuxStringInterna = gramatica[i][j];
+					AuxString = first[i][j];
+					AuxChar = AuxString[0];
 					CharAtual = 0;
-					
-					//////Ideia atual = If verifica se ultima caracter eh um estado nao terminal e faz
-					//////Varedura de first novamente, se for nao terminal e vazio concatena com o prox
-					///// se nao for segue o jogo
-					if(EstadoNaoTerminal(EstadosNT, CharAuxInterno, NEstados))
+					StringRetorno = "";
+
+					while(1)
 					{
-						indice = Indice(EstadosNT, AuxCharInterno, NEstados);
-						string s;
-						char c;
-						for(int k = 0; k < NSequencias; k++)
+						AuxCharInterno = AuxStringInterna[CharAtual];
+						if(EstadoNaoTerminal(EstadosNT, AuxCharInterno, NEstados) && AuxChar == '\0')
 						{
-							s = first[indice][k];
-							c = s[0];
-							if(c != '\0')
-								AuxInt++;
-						}
-						if(AuxInt == NProducoes[indice])
-						{
-							for(int k = 0; k < NSequencias; k++)
-							{
-								StringFirst += first[indice][k];
-							}
-							StringFirst = RemoveEspacos(StringFirst);
-							AuxInt1 = StringLength(StringFirst);
-							c = StringFirst[AuxInt1];
-							if(c == '/')
-							{
-								CharAtual++;
-								NextChar = AuxString[CharAtual];
-								if(NextChar != '\0')
-								{
-									StringFirst[AuxInt1] = NextChar;
-								}
-							}
-						}
-					}
-					elseif(CharAuxInterno == '\0')
-					{
-						AuxString = gramatica[i][j];
-						AuxChar = AuxString[0];
-						if(AuxChar != '\0')
-						{
-							indice = Indice(EstadosNT, AuxChar, NEstados);
+							AuxInt = 0;
+							indice = Indice(EstadosNT, AuxCharInterno, NEstados);
 							string s;
 							char c;
-							for(int k = 0; k < NSequencias; k++)
+							for(int k = 1; k < NSequencias + 1; k++)
 							{
 								s = first[indice][k];
 								c = s[0];
@@ -285,34 +276,81 @@ int main()
 							}
 							if(AuxInt == NProducoes[indice])
 							{
-								for(int k = 0; k < NSequencias; k++)
+								for(int k = 1; k < NSequencias + 1; k++)
 								{
-									StringFirst += first[indice][k];
-								}
-								StringFirst = RemoveEspacos(StringFirst);
-								AuxInt1 = StringLength(StringFirst);
-								c = StringFirst[AuxInt1];
-								if(c == '/')
-								{
-									CharAtual++;
-									NextChar = AuxString[CharAtual];
-									if(NextChar != '\0')
+									x = first[indice][k];
+									if(k == 1)
 									{
-										StringFirst[AuxInt1] = NextChar;
+										StringFirst = x;
+									}
+									else if(x != "")
+									{
+										StringFirst += x;
 									}
 								}
+								AuxInt1 = StringLength(StringFirst);
+								c = StringFirst[AuxInt1 - 1];
+								if(c == '/')
+								{
+									NextChar = AuxStringInterna[CharAtual + 1];
+									if(EstadoNaoTerminal(EstadosNT, NextChar, NEstados))
+									{
+										StringFirst[AuxInt1 - 1] = '\0';
+										StringRetorno = StringConcat(StringRetorno, StringFirst);
+										CharAtual++;
+
+									}
+									else if(NextChar != '\0')
+									{
+										StringFirst[AuxInt1 - 1] = NextChar;
+										StringRetorno = StringConcat(StringRetorno, StringFirst);
+										first[i][j] = StringRetorno;
+										break;
+									}
+									else
+									{
+										StringRetorno = StringConcat(StringRetorno, StringFirst);
+										first[i][j] = StringRetorno;
+										break;
+									}
+
+								}
+								else
+								{
+									StringRetorno = StringConcat(StringRetorno, StringFirst);
+									first[i][j] = StringRetorno;
+									break;
+								}
+							}
+							else
+							{
+								break;
 							}
 						}
-					}
-					else
-					{
-						Count++;
+						else if(AuxChar != '\0')
+						{
+							Count++;
+							break;
+						}
+						else
+						{
+							break;
+						}
 					}
 				}
 			}
 
 			if(Count == NProducoesTotais)
 				break;
+		}
+
+		for(i = 0; i < NEstados; i++)
+		{
+			for(j = 0; j < NSequencias + 1; j++)
+			{
+				cout << first[i][j] << " ";
+			}
+			cout << "\n";
 		}
 	}
 	else if(op == 2)

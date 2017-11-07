@@ -1,0 +1,19 @@
+Abcde
+CB
++CB /
+ED
+*ED /
+id (A)
+
+Sbc
+Bb Cd
+aB /
+cC /
+
+SaBcDe
+ABCDE
+a /
+b /
+c
+d /
+e /
