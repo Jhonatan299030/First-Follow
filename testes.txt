@@ -17,3 +17,9 @@ b /
 c
 d /
 e /
+
+S a B c
+ACB CbB Ba
+da BC
+g /
+h /

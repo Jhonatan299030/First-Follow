@@ -134,6 +134,34 @@ string StringConcat(string x, string y)
 	}
 	return x;
 }
+string RemoveCaracterRepetido(string x, int NEstados)
+{
+	string StringInterna;
+	char Caracterx, CaracterInterno;
+	int TamStringInterna, Count, TamStringx = StringLength(x);
+	for(int i = 0; i < TamStringx; i++)
+	{
+		Caracterx = x[i];
+		TamStringInterna = StringLength(StringInterna);
+		Count = 0;
+		if(StringInterna == "")
+		{
+			StringInterna = Caracterx;
+		}
+		else
+		{
+			for(int j = 0; j < TamStringInterna; j++)
+			{
+				CaracterInterno = StringInterna[j];
+				if(CaracterInterno != Caracterx)
+					Count++;
+			}
+			if(Count == TamStringInterna)
+				StringInterna += Caracterx;
+		}
+	}
+	return StringInterna;
+}
 int main()
 {
 //Declaracao variaveis
@@ -176,6 +204,7 @@ int main()
 		string gramatica[NEstados][NSequencias + 1];
 		string first[NEstados][NSequencias + 1];
 		string follow[NEstados][NSequencias + 1];
+		string VFirst[NEstados];
 
 		//Transferindo os estados para as Matrizes
 		for(i = 0; i < NEstados; i++)
@@ -343,14 +372,16 @@ int main()
 			if(Count == NProducoesTotais)
 				break;
 		}
-
+		//Limpa as producoes da matriz first e joga no vetor
 		for(i = 0; i < NEstados; i++)
 		{
-			for(j = 0; j < NSequencias + 1; j++)
+			for(j = 1; j < NSequencias + 1; j++)
 			{
-				cout << first[i][j] << " ";
+				VFirst[i] += first[i][j];
 			}
-			cout << "\n";
+			AuxString = VFirst[i];
+			VFirst[i] = RemoveCaracterRepetido(AuxString, NEstados);
+			cout << VFirst[i] << "\n";
 		}
 	}
 	else if(op == 2)
