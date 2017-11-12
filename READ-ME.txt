@@ -1,0 +1,49 @@
+A inserção de dados deve ser feita da seguinte forma:
+
+- Estados não terminais (indiferente se digitar maiúsculas ou minúsculas)
+- Produções de cada estado (letras maiúsculas representam estados não terminais (exceto se não tiverem sido declaradas no passo anterior))
+- Cada caracter representa um único estado por tanto estados com sufixo como (E') serão considerados como dois estados distindos: (E) e (')
+
+Exemplos de gramatica aceita:
+
+Exemplo-1:
+SaBcDe
+ABCDE
+a /
+b /
+c
+d /
+e /
+
+
+Exemplo-2:
+Sbc
+Bb Cd
+aB /
+cC /
+
+
+Exemplo-3:
+Abcde
+CB
++CB /
+ED
+*ED /
+id (A)
+
+
+Exemplo-4:
+S a B c
+ACB CbB Ba
+da BC
+g /
+h /
+
+Exemplo-5:
+SABCDEF
+A a /
+B b /
+C c /
+D d /
+E e /
+F f
